@@ -45,7 +45,7 @@ where $J$ is the Jacobian at the solution and $\text{DOF}$ is the degrees of fre
 
 #include "lm.hpp"
 
-struct ExponentialModel
+struct Model
 {
 	Eigen::VectorXd t;
 
@@ -87,8 +87,8 @@ int main()
 		Eigen::VectorXd y_obs = 5.0 * (-0.8 * t).array().exp() + 1.2;
 		y_obs += Eigen::VectorXd::Random(n) * 0.4;
 
-		ExponentialModel model{t};
-		lmfit::LMFit<ExponentialModel> solver;
+		Model model{t};
+		lmfit::LMFit<Model> solver;
 		
 		Eigen::VectorXd x_init(3);
 		x_init << 10.0, 0.01, 0.1; // initial guess
