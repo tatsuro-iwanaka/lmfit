@@ -9,9 +9,34 @@ A header-only C++ template library for non-linear least squares problems using t
 
 ## Usage
 
-### 1. Define your Problem Class
+### Defining the Problem Class
 
-You must provide a `Problem` class that implements the following interface:
+To use the solver, you must define a `Problem` class that encapsulates your model and its derivatives. The solver expects the following interface:
+
+### Required Interface
+
+| Method | Signature | Description |
+| :--- | :--- | :--- |
+| **`forward`** | `Eigen::VectorXd forward(const Eigen::VectorXd& x) const` | Returns the model's predicted values for a given parameter vector `x`. Used for verifying residual improvements. |
+| **`evaluate`** | `std::pair<Eigen::VectorXd, Eigen::MatrixXd> evaluate(const Eigen::VectorXd& x) const` | Returns a pair containing the predicted values and the **Jacobian matrix** $J$ at `x`. $J_{ij}$ must represent the partial derivative $\frac{\partial y_i}{\partial x_j}$. |
+| **`constrain`** | `Eigen::VectorXd constrain(const Eigen::VectorXd& x) const` | (Optional) Applies boundary conditions or constraints to the parameters. If no constraints are needed, return `x` as-is. |
+
+## Optimization Result Structure
+
+The `minimize` function returns a `Result` object containing the following members:
+
+| Member | Type | Description |
+| :--- | :--- | :--- |
+| **`x`** | `Eigen::VectorXd` | The optimized parameter vector. |
+| **`x_error`** | `Eigen::VectorXd` | $1\text{-}\sigma$ standard error for each parameter, derived from the diagonal of the covariance matrix. |
+| **`final_chi2`** | `double` | The final sum of squared residuals (chi-squared). |
+| **`converged`** | `bool` | A boolean flag indicating whether the optimization satisfied the convergence criteria within the maximum iterations. |
+
+### Error Estimation Detail
+
+The standard error is calculated based on the variance-covariance matrix:
+$$\text{Cov} = (J^T J)^{-1} \cdot \frac{\chi^2}{\text{DOF}}$$
+where $J$ is the Jacobian at the solution and $\text{DOF}$ is the degrees of freedom ($n_{obs} - n_{param}$).
 
 ```cpp
 #include <iostream>
