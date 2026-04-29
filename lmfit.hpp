@@ -1,7 +1,10 @@
 #include <iostream>
 #include <Eigen/Dense>
 
-template <typename Problem> class LevenbergMarquardt
+namespace lmfit
+{
+
+template <typename Problem> class LMFit
 {
 	public:
 		struct Config
@@ -22,7 +25,7 @@ template <typename Problem> class LevenbergMarquardt
 			bool converged;           // 収束したか
 		};
 
-		explicit LevenbergMarquardt(Config config = {}) : config_(std::move(config))
+		explicit LMFit(Config config = {}) : config_(std::move(config))
 		{
 			;
 		}
@@ -35,7 +38,7 @@ template <typename Problem> class LevenbergMarquardt
 		Eigen::VectorXd calculateError(const Eigen::MatrixXd&, double, int, int) const;
 };
 
-template <typename Problem> inline LevenbergMarquardt<Problem>::Result LevenbergMarquardt<Problem>::minimize(Problem& problem, const Eigen::VectorXd& y_obs, const Eigen::VectorXd& x_init) const
+template <typename Problem> inline LMFit<Problem>::Result LMFit<Problem>::minimize(Problem& problem, const Eigen::VectorXd& y_obs, const Eigen::VectorXd& x_init) const
 {
 	Eigen::VectorXd x = x_init;
 	double lambda = config_.lambda_init;
@@ -100,7 +103,7 @@ template <typename Problem> inline LevenbergMarquardt<Problem>::Result Levenberg
 	return {x, calculateError(J, chi2, n_obs, n_param), chi2, false};
 }
 
-template <typename Problem> inline Eigen::VectorXd LevenbergMarquardt<Problem>::calculateError(const Eigen::MatrixXd& J, double chi2, int n_obs, int n_param) const
+template <typename Problem> inline Eigen::VectorXd LMFit<Problem>::calculateError(const Eigen::MatrixXd& J, double chi2, int n_obs, int n_param) const
 {
 	double dof = std::max(1.0, static_cast<double>(n_obs - n_param));
 	double sigma2 = chi2 / dof;
@@ -115,4 +118,6 @@ template <typename Problem> inline Eigen::VectorXd LevenbergMarquardt<Problem>::
 	Eigen::MatrixXd cov = svd.matrixV() * inv_singular_values.matrix().asDiagonal() * svd.matrixU().transpose();
 
 	return cov.diagonal().cwiseAbs().cwiseSqrt() * std::sqrt(sigma2);
+}
+
 }
