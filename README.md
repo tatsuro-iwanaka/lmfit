@@ -80,7 +80,7 @@ struct ExponentialModel
 int main()
 {
     {
-		int n = 500;
+		int n = 20;
 		Eigen::VectorXd t = Eigen::VectorXd::LinSpaced(n, 0, 5);
 		
 		// answer [a=5.0, b=0.8, c=1.2] + noise
@@ -88,7 +88,7 @@ int main()
 		y_obs += Eigen::VectorXd::Random(n) * 0.4;
 
 		ExponentialModel model{t};
-		lmfit::LmFit<ExponentialModel> solver;
+		lmfit::LMFit<ExponentialModel> solver;
 		
 		Eigen::VectorXd x_init(3);
 		x_init << 10.0, 0.01, 0.1; // initial guess
