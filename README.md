@@ -43,7 +43,7 @@ where $J$ is the Jacobian at the solution and $\text{DOF}$ is the degrees of fre
 #include <iostream>
 #include <Eigen/Dense>
 
-#include "lm.hpp"
+#include "lmfit.hpp"
 
 struct Model
 {
